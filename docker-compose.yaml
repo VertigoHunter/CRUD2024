@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  backend:
+    build: backend/
+    depends_on:
+      - 'backend'
+
+    ports:
+      - '8081:8081'
+
+  frontend:
+    build: cargo-bay-app/
+    depends_on:
+      - 'backend'
+    ports:
+      - '3000:3000'
+
+  database:
+    image: postgres
+    container_name: pg-docker
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: cargo_bay
+      DATABASE_URL: postgres://postgres:docker@backend:5432/cargo_bay
+
+
+    volumes:
+      - $HOME/docker/volumes/postgres:/var/lib/postgresql/data
