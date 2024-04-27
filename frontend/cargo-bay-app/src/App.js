@@ -136,15 +136,76 @@ export default function App() {
 
   const RenderEditBar = () =>{
     if (editMode)
-    return(
-      <div>
-        <p>edit bar shows</p>
-      </div>)
-    else (
-      <div>
-        <p>edit bar hidden</p>
-      </div>
-    )
+      return(
+        <>
+          <div className="edit-enabled">
+            <h3>EDIT MODE ACTIONS</h3>
+            {/* For adding new items to the Database */}
+            <input type="text" name="user info ID" onChange={(e) => { setUserInfoID(e.target.value) }} value={userInfoID} placeholder="Input Your User Info ID" />
+            <input type="text" name="item name" onChange={(e) => { setItemName(e.target.value) }} value={itemName} placeholder="Input Item Name" />
+            <input type="text" name="description" onChange={(e) => { setDescription(e.target.value) }} value={description} placeholder="Input Description" />
+            <input type="text" name="quantity" onChange={(e) => { setQuantity(e.target.value) }} value={quantity} placeholder="Input Quantity" />
+            <button onClick={() => { addItem() }}>Create Item</button>
+            <h6>Input new item information above and click create.</h6>
+            <br></br>
+            {/* For editing items that exist in the Database */}
+            <input type="text" name="update user info ID" onChange={(e) => { setUpdateUserInfoID(e.target.value) }} value={updateUserInfoID} placeholder="Change User Info ID" />
+            <input type="text" name="update item name" onChange={(e) => { setUpdateItemName(e.target.value) }} value={updateItemName} placeholder="Change Item Name" />
+            <input type="text" name="update description" onChange={(e) => { setUpdateDescription(e.target.value) }} value={updateDescription} placeholder="Change Description" />
+            <input type="text" name="update quantity" onChange={(e) => { setUpdateQuantity(e.target.value) }} value={updateQuantity} placeholder="Change Quantity" />
+            <h6>Input updated item information and select the row to update below.</h6>
+          </div>
+
+          <div className='inventoryTable'>
+            <table>
+              <tbody>
+                <tr className='columntitle'>
+                  <th>Item ID</th>
+                  <th>User ID</th>
+                  <th>Item Name</th>
+                  <th>Description</th>
+                  <th>Quantity</th>
+                  <th>Update</th>
+                  <th>Delete</th>
+                </tr>
+                {inventory.map((inventory, index) =>
+                  <tr key={index}>
+                    <td>{inventory.item_ID}</td>
+                    <td>{inventory.user_info_ID}</td>
+                    <td>{inventory.item_name}</td>
+                    <td>{inventory.description}</td>
+                    <td>{inventory.quantity}</td>
+                    <td><button onClick={() => { { setTargetItemID(inventory.item_ID) } { editItem(targetItemID) } }}>Update</button></td>
+                    <td><button onClick={() => { { setTargetItemID(inventory.item_ID) } { deleteItem(targetItemID) } }} className="trashbutton"><img src={trashbin} alt="trashbin" className='trashimage'></img></button></td>
+                  </tr>)}
+              </tbody>
+            </table>
+          </div>
+        </>)
+    else
+      return(
+        <div className='inventoryTable'>
+          <table>
+            <tbody>
+              <tr className='columntitle'>
+                <th>Item ID</th>
+                <th>User ID</th>
+                <th>Item Name</th>
+                <th>Description</th>
+                <th>Quantity</th>
+              </tr>
+            {inventory.map((inventory, index) =>
+              <tr key={index}>
+                <td>{inventory.item_ID}</td>
+                <td>{inventory.user_info_ID}</td>
+                <td>{inventory.item_name}</td>
+                <td>{inventory.description}</td>
+                <td>{inventory.quantity}</td>
+              </tr>)}
+            </tbody>
+          </table>
+        </div>
+      )
   }
 
   return !inventory ? null : (
@@ -178,27 +239,7 @@ export default function App() {
       <button onClick={setEditMode}>{editMode ? 'Edit Mode On ' : 'Edit Mode Off'}</button>
       <RenderEditBar/>
 
-      <div className="edit-bar">
-        <div className="edit-enabled">
-          <h3>EDIT MODE ACTIONS</h3>
-          {/* For adding new items to the Database */}
-          <input type="text" name="user info ID" onChange={(e) => { setUserInfoID(e.target.value) }} value={userInfoID} placeholder="Input Your User Info ID"/>
-          <input type="text" name="item name" onChange={(e) => { setItemName(e.target.value) }} value={itemName} placeholder="Input Item Name"/>
-          <input type="text" name="description" onChange={(e) => { setDescription(e.target.value) }} value={description} placeholder="Input Description"/>
-          <input type="text" name="quantity" onChange={(e) => { setQuantity(e.target.value) }} value={quantity} placeholder="Input Quantity"/>
-          <button onClick={() => {addItem()}}>Create Item</button>
-          <h6>Input new item information above and click create.</h6>
-          <br></br>
-          {/* For editing items that exist in the Database */}
-          <input type="text" name="update user info ID" onChange={(e) => { setUpdateUserInfoID(e.target.value) }} value={updateUserInfoID} placeholder="Change User Info ID"/>
-          <input type="text" name="update item name" onChange={(e) => { setUpdateItemName(e.target.value) }} value={updateItemName} placeholder="Change Item Name"/>
-          <input type="text" name="update description" onChange={(e) => { setUpdateDescription(e.target.value) }} value={updateDescription} placeholder="Change Description"/>
-          <input type="text" name="update quantity" onChange={(e) => { setUpdateQuantity(e.target.value) }} value={updateQuantity} placeholder="Change Quantity"/>
-          <h6>Input updated item information and select the row to update below.</h6>
-          </div>
-        <div className="edit-disabled"></div>
-      </div>
-      <div className='inventoryTable'>
+      {/* <div className='inventoryTable'>
         <table>
           <tbody>
             <tr className='columntitle'>
@@ -222,7 +263,7 @@ export default function App() {
               </tr>)}
           </tbody>
         </table>
-      </div>
+      </div> */}
   </div>
   );
 }
