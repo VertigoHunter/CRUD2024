@@ -24,8 +24,8 @@ export default function App() {
   const [createUserName, setCreateUserName] = useState();   // This stores the entered user account information for signup.
   const [createPassword, setCreatePassword] = useState();   // This stores the entered user account information for signup.
 
-  //const [loginUserName, setLoginUserName] = useState(); // This stores the username for authentication.
-  //const [loginPassword, setLoginPassword] = useState(); // This stores the password for authentication.
+  const [loginUserName, setLoginUserName] = useState(); // This stores the username for authentication.
+  const [loginPassword, setLoginPassword] = useState(); // This stores the password for authentication.
 
   // The following store information for adding new items to the database.
   const [userInfoID, setUserInfoID] = useState(2);
@@ -39,6 +39,9 @@ export default function App() {
   const [updateDescription, setUpdateDescription] = useState("");
   const [updateQuantity, setUpdateQuantity] = useState("");
 
+  // The following stores the target item_ID for update and delete actions.
+  const [targetItemID, setTargetItemID] = useState("");
+
     /* THIS SECTION HOLDS METHODS AND ACTIONS */
     useEffect(()=> {
       fetch('http://localhost:8081/item')
@@ -48,7 +51,7 @@ export default function App() {
   // },[inventory])
 
   const addUser = () =>{
-    fetch('http://localhost:8081/user_info/', {
+    fetch('http://localhost:8081/user_info', {
       method: 'POST',
       body: JSON.stringify({
         first_name: createFirstName,
@@ -63,6 +66,14 @@ export default function App() {
     .then((response) => response.json())
     .then((json) => console.log(json));
   }
+
+  // const loginUser = () =>{
+  //   fetch('http://localhost:8081/user_info', {
+  //     method: 'GET',
+  //     user_name: loginUserName,
+  //     password: loginPassword
+  //   })
+  // }
 
   const addItem = () =>{
     fetch('http://localhost:8081/item', {
@@ -82,6 +93,7 @@ export default function App() {
   }
 
   const editItem = (item_ID) =>{
+    targetItemID = item_ID;
     fetch('http://localhost:8081/item/${item_ID}', {
       method: 'PUT',
       body: JSON.stringify({
@@ -98,11 +110,42 @@ export default function App() {
     .then((json) => console.log(json));
   }
 
+
+  // function onDeleteItem(){
+  //   var id = document.getElementById("selectedItemId").value;
+  //   const deleted = fetch('http://localhost:8081/${item_ID}',{
+  //     method: 'DELETE',
+  //     headers: {'Content-type': 'application/json; charset=UTF-8'}
+  //   })
+  // }
+
+  // const deleteItem = () =>{
+  //   fetch('http://localhost:8081/item/4', {
+  //       method: 'DELETE',
+  //       headers: {'Content-type': 'application/json; charset=UTF-8'}
+  //     });
+  // }
+
   const deleteItem = (item_ID) =>{
-    fetch(`http://localhost:8081/item/${item_ID}`, {
+    targetItemID = item_ID;
+    fetch('http://localhost:8081/item/${item_ID}', {
         method: 'DELETE',
+        headers: {'Content-type': 'application/json; charset=UTF-8'}
       });
-    }
+  }
+
+  const RenderEditBar = () =>{
+    if (editMode)
+    return(
+      <div>
+        <p>edit bar shows</p>
+      </div>)
+    else (
+      <div>
+        <p>edit bar hidden</p>
+      </div>
+    )
+  }
 
   return !inventory ? null : (
   <div className="App">
@@ -132,9 +175,8 @@ export default function App() {
         </div>
       </div>
 
-      <button onClick={setEditMode}>
-        {editMode ? 'Edit Mode Enabled' : 'Click To Enable Edit Mode'}
-      </button>
+      <button onClick={setEditMode}>{editMode ? 'Edit Mode On ' : 'Edit Mode Off'}</button>
+      <RenderEditBar/>
 
       <div className="edit-bar">
         <div className="edit-enabled">
@@ -175,8 +217,8 @@ export default function App() {
                 <td>{inventory.item_name}</td>
                 <td>{inventory.description}</td>
                 <td>{inventory.quantity}</td>
-                <td><button onClick={() =>{ editItem(inventory.item_ID) }}>Update</button></td>
-                <td><button onClick={() => { deleteItem(inventory.item_ID) }} className="trashbutton"><img src={trashbin} alt="trashbin" className='trashimage'></img></button></td>
+                <td><button onClick={() => { {setTargetItemID(inventory.item_ID)} {editItem(targetItemID)} }}>Update</button></td>
+                <td><button onClick={() => { {setTargetItemID(inventory.item_ID)} {deleteItem(targetItemID)} }} className="trashbutton"><img src={trashbin} alt="trashbin" className='trashimage'></img></button></td>
               </tr>)}
           </tbody>
         </table>

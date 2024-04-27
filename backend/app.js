@@ -50,6 +50,7 @@ app.get('/item', (request, response) => {
     );
 });
 
+// GET ROUTE. Below retrieves the current item by item_ID as provided by item_table.
 app.get('/item/:item_ID', (request, response) => {
   var { item_ID } = request.params;
   knex('item')
@@ -76,6 +77,19 @@ app.get('/user_info', (request, response) => {
     })
     );
 });
+
+// GET ROUTE. Below retrieves the current user profile from the user_info table. Might be disabled/hidden later for security?
+// app.get('/user_info', (request, response) => {
+//   knex('user_info')
+//   .select('*')
+//   .then(profile => response.status(200).json(profile))
+//   .catch(err =>
+//     response.status(404).json({
+//       message:
+//       'The data is not available.'
+//     })
+//     );
+// });
 
 /* THE FOLLOWING ARE POST REQUESTS TO SUBMIT NEW INFORMATION TO THE DATABASE */
 
@@ -130,11 +144,9 @@ app.post('/item', async(request, response) => {
 /* THE FOLLOWING ARE PUT REQUESTS FOR UPDATES TO THE DATABASE */
 
 // Below provides an update to the current inventory as provided by item_table.
-app.put('/item/:item_ID', function(request, response){
-  var { item_ID } = request.params;
-  knex('item').where('item_ID', req.params.item_ID)
+app.put('/item/:item_ID', async(request, response) =>{
+  await knex('item').where('item_ID', req.params.item_ID)
   .update({
-    item_ID: request.body.user.item_ID,
     user_info_ID: request.body.user_info_ID,
     item_name: request.body.item_name,
     description: request.body.description,
@@ -143,8 +155,8 @@ app.put('/item/:item_ID', function(request, response){
   .then(()=>{
     knex('item')
     .select('*')
-    .then(inventory => {
-      response.json(inventory);
+    .then(item => {
+      response.json(item);
     })
   })
 });
@@ -166,16 +178,56 @@ app.put('/user_info/:user_info_ID', function(request, response){
     })
   })
 
-  //delete method
+  //DELETE REQUEST. Deletes the item by its item_ID as provided by item_table.
   app.delete('/item/:item_ID', function(request, response){
-    knex('item').where(item_ID, request.params.item_ID)
+    knex('item').where('item_ID', req.params.item_ID)
     .del()
     .then(()=>{
-        knex('item')
-            .select('*')
-            .then(item => {
-                res.json(item);
-            })
+      knex('item')
+      .select('*')
+      .then(inventory => {
+        response.json(inventory);
+      })
     })
-  })
-});
+  });
+
+  // app.delete('/item/:item_ID', function(req, res){
+  //   knex('item').where('item_ID', req.params.item_ID)
+  //   .del()
+  //   .then(function(){
+  //       knex('item')
+  //           .select('*')
+  //           .then(item => {
+  //               res.json(item);
+  //           })
+  //   })
+
+})
+
+  // app.delete('/item/:item_ID', function(request, response){
+  //   var { item_ID } = request.params;
+  //   knex('item')
+  //   .where('item_ID', item_ID)
+  //   .del()
+  //   .then(function(){
+  //     knex.select()
+  //         .from('item')
+  //         .then(function(item){
+  //           res.send(item);
+  //         })
+  //   })
+  // })
+
+  // app.delete('/item/:item_ID', function(request, response){
+  //   var { item_ID } = request.params;
+  //   knex('item')
+  //   .where('item_ID', item_ID)
+  //   .del()
+  //   .then(()=>{
+  //       knex('item')
+  //           .select('*')
+  //           .then(item => {
+  //               res.json(item);
+  //           })
+  //   })
+  // })
