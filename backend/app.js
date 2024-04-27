@@ -50,6 +50,20 @@ app.get('/item', (request, response) => {
     );
 });
 
+app.get('/item/:item_ID', (request, response) => {
+  var { item_ID } = request.params;
+  knex('item')
+  .select('*')
+  .where('item_ID', item_ID)
+  .then(inventory => {response.status(200).json(inventory)})
+  .catch(err =>
+    response.status(404).json({
+      message:
+      'The data is not available.'
+    })
+    );
+});
+
 // GET ROUTE. Below retrieves the current user profile from the user_info table. Might be disabled/hidden later for security?
 app.get('/user_info', (request, response) => {
   knex('user_info')
@@ -117,14 +131,16 @@ app.post('/item', async(request, response) => {
 
 // Below provides an update to the current inventory as provided by item_table.
 app.put('/item/:item_ID', function(request, response){
+  var { item_ID } = request.params;
   knex('item').where('item_ID', req.params.item_ID)
   .update({
+    item_ID: request.body.user.item_ID,
     user_info_ID: request.body.user_info_ID,
     item_name: request.body.item_name,
     description: request.body.description,
     quantity: request.body.quantity
   })
-  .then(function(){
+  .then(()=>{
     knex('item')
     .select('*')
     .then(inventory => {
@@ -142,7 +158,7 @@ app.put('/user_info/:user_info_ID', function(request, response){
     user_name: request.body.user_name,
     password: request.body.password
   })
-  .then(function(){
+  .then(()=>{
     knex('user_info')
     .select('*')
     .then(profile => {
@@ -151,10 +167,10 @@ app.put('/user_info/:user_info_ID', function(request, response){
   })
 
   //delete method
-  app.delete('/item/:id', function(req, res){
-    knex('item').where('item_ID', req.params.id)
+  app.delete('/item/:item_ID', function(request, response){
+    knex('item').where(item_ID, request.params.item_ID)
     .del()
-    .then(function(){
+    .then(()=>{
         knex('item')
             .select('*')
             .then(item => {

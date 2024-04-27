@@ -1,4 +1,5 @@
 import Cargo_Bay_Logo from './CargoBay.png';
+import trashbin from './trashbin.png';
 // import ReactDom from 'react-dom/client';
 // import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
@@ -13,14 +14,10 @@ export default function App() {
 
   /* THIS SECTION HOLDS STATE VARIABLES*/
   const [editMode, setEditMode] = useEditModeToggle();
-  //const [editFlag, setEditFlag] = useState();   // This determines whether you have enabled Edit Mode.
-  //const [viewFlag, setViewFlag] = useState();   // This determines whether you are seeing the inventory or an item.
   const [greeting, setGreeting] = useState("Guest");
   useEffect(() => {setGreeting('Scruffy Nerfherder')});
 
-  //const [inventory, setInventory] = useState(0);         // This displays and controls the full inventory.
   const [inventory, setInventory] = useState();
-  //const [selectedItem, setSelectedItem] = useState();   // This displays the selected item.
 
   const [createFirstName, setCreateFirstName] = useState(); // This stores the entered user account information for signup.
   const [createLastName, setCreateLastName] = useState();   // This stores the entered user account information for signup.
@@ -30,17 +27,25 @@ export default function App() {
   //const [loginUserName, setLoginUserName] = useState(); // This stores the username for authentication.
   //const [loginPassword, setLoginPassword] = useState(); // This stores the password for authentication.
 
-  const [userInfoID, setUserInfoID] = useState(2);   // This stores the item name for inventory adjustment.
-  const [itemName, setItemName] = useState("");       // This stores the item name for inventory adjustment.
-  const [description, setDescription] = useState(""); // This stores the description for inventory adjustment.
-  const [quantity, setQuantity] = useState("");       // This stores the quantity for inventory adjustment.
+  // The following store information for adding new items to the database.
+  const [userInfoID, setUserInfoID] = useState(2);
+  const [itemName, setItemName] = useState("");
+  const [description, setDescription] = useState("");
+  const [quantity, setQuantity] = useState("");
+
+  // The following store information for editing items that exist in the database.
+  const [updateUserInfoID, setUpdateUserInfoID] = useState("");
+  const [updateItemName, setUpdateItemName] = useState("");
+  const [updateDescription, setUpdateDescription] = useState("");
+  const [updateQuantity, setUpdateQuantity] = useState("");
 
     /* THIS SECTION HOLDS METHODS AND ACTIONS */
     useEffect(()=> {
       fetch('http://localhost:8081/item')
       .then(response => response.json())
       .then(inventoryData => setInventory(inventoryData))
-    },[inventory])
+    },[])
+  // },[inventory])
 
   const addUser = () =>{
     fetch('http://localhost:8081/user_info/', {
@@ -76,6 +81,29 @@ export default function App() {
     .then((json) => console.log(json));
   }
 
+  const editItem = (item_ID) =>{
+    fetch('http://localhost:8081/item/${item_ID}', {
+      method: 'PUT',
+      body: JSON.stringify({
+        user_info_ID: updateUserInfoID,
+        item_name: updateItemName,
+        description: updateDescription,
+        quantity: updateQuantity
+      }),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+      },
+    })
+    .then((response) => response.json())
+    .then((json) => console.log(json));
+  }
+
+  const deleteItem = (item_ID) =>{
+    fetch(`http://localhost:8081/item/${item_ID}`, {
+        method: 'DELETE',
+      });
+    }
+
   return !inventory ? null : (
   <div className="App">
       <header className="App-header">
@@ -108,42 +136,48 @@ export default function App() {
         {editMode ? 'Edit Mode Enabled' : 'Click To Enable Edit Mode'}
       </button>
 
-      <div className="edit-mode">
+      <div className="edit-bar">
         <div className="edit-enabled">
-          <p>EDIT MODE ACTIONS</p>
+          <h3>EDIT MODE ACTIONS</h3>
+          {/* For adding new items to the Database */}
           <input type="text" name="user info ID" onChange={(e) => { setUserInfoID(e.target.value) }} value={userInfoID} placeholder="Input Your User Info ID"/>
           <input type="text" name="item name" onChange={(e) => { setItemName(e.target.value) }} value={itemName} placeholder="Input Item Name"/>
           <input type="text" name="description" onChange={(e) => { setDescription(e.target.value) }} value={description} placeholder="Input Description"/>
           <input type="text" name="quantity" onChange={(e) => { setQuantity(e.target.value) }} value={quantity} placeholder="Input Quantity"/>
           <button onClick={() => {addItem()}}>Create Item</button>
+          <h6>Input new item information above and click create.</h6>
           <br></br>
-          <button onClick={() => { }}>Edit Item</button>
-          <button onClick={() => { }}>Delete Item</button>
+          {/* For editing items that exist in the Database */}
+          <input type="text" name="update user info ID" onChange={(e) => { setUpdateUserInfoID(e.target.value) }} value={updateUserInfoID} placeholder="Change User Info ID"/>
+          <input type="text" name="update item name" onChange={(e) => { setUpdateItemName(e.target.value) }} value={updateItemName} placeholder="Change Item Name"/>
+          <input type="text" name="update description" onChange={(e) => { setUpdateDescription(e.target.value) }} value={updateDescription} placeholder="Change Description"/>
+          <input type="text" name="update quantity" onChange={(e) => { setUpdateQuantity(e.target.value) }} value={updateQuantity} placeholder="Change Quantity"/>
+          <h6>Input updated item information and select the row to update below.</h6>
           </div>
         <div className="edit-disabled"></div>
       </div>
-
-      <div className="edit-bar">
-        <p>dead edit bar</p>
-
-      </div>
-
-      <div className="view-bar">
-        <p>VIEW ACTIONS</p>
-        <button onClick={() => { }}>View Item</button>
-      </div>
-
       <div className='inventoryTable'>
         <table>
           <tbody>
-          <tr className='columntitle'>
-            <th>Item ID</th>
-            <th>User ID</th>
-            <th>Item Name</th>
-            <th>Description</th>
-            <th>Quantity</th>
-          </tr>
-          {inventory.map((inventory, index) =><tr><td>{inventory.item_ID}</td><td>{inventory.user_info_ID}</td><td>{inventory.item_name}</td><td>{inventory.description}</td><td>{inventory.quantity}</td></tr>)}
+            <tr className='columntitle'>
+              <th>Item ID</th>
+              <th>User ID</th>
+              <th>Item Name</th>
+              <th>Description</th>
+              <th>Quantity</th>
+              <th>Update</th>
+              <th>Delete</th>
+            </tr>
+            {inventory.map((inventory, index) =>
+              <tr key={index}>
+                <td>{inventory.item_ID}</td>
+                <td>{inventory.user_info_ID}</td>
+                <td>{inventory.item_name}</td>
+                <td>{inventory.description}</td>
+                <td>{inventory.quantity}</td>
+                <td><button onClick={() =>{ editItem(inventory.item_ID) }}>Update</button></td>
+                <td><button onClick={() => { deleteItem(inventory.item_ID) }} className="trashbutton"><img src={trashbin} alt="trashbin" className='trashimage'></img></button></td>
+              </tr>)}
           </tbody>
         </table>
       </div>
