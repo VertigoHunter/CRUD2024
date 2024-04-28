@@ -32,6 +32,10 @@ To get started until docker compose is completed:
     - docker exec -it <container id> bash
     - psql -U postgres
     - create DATABASE crudz; //Comment: named based on database for CRUD for Z prefix
+    - \list
+    - \c cargo_bay
+    - \dt
+    - \d item
 5) cd into database
 6) npx knex migrate:rollback several times(if errors in step 7-8)
 7) npx knex migrate:latest

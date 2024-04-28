@@ -178,7 +178,24 @@ app.put('/user_info/:id', function(request, response){
     })
   })
 
-  //DELETE REQUEST. Deletes the item by its item_ID as provided by item_table.
+//DELETE REQUEST. Deletes the item by its item_ID as provided by item_table.
+app.delete('/item/:id', function(req, res){
+  knex.raw('DELETE FROM item WHERE id = ?', req.params.id)
+})
+
+// app.delete('/item/:id', function(req, res){
+//   knex('item').where('id', req.params.id)
+//               .del()
+//               .then(function(){
+//                 knex.select()
+//                     .from('item')
+//                     .then(function(item){
+//                       res.send(item);
+//                     })
+//               });
+// })
+
+
   // app.delete('/item/:id', (request, response) => {
   //   knex('item').where('id', 7).del()
   // })
@@ -194,19 +211,18 @@ app.put('/user_info/:id', function(request, response){
   //   })
   // });
 
-  app.delete('/item/:id', (request, response) => {
-    let { id } = request.params;
-    knex('item')
-    .select('*')
-    .where('id', id)
-    .delete()
-    .then(inventory => {return res.json({msg: "bob"});})
-    console.log(inventory)
-    .catch((err) => {
-      console.error(err);
-      return res.json({msg: err});
-      });
-  });
+  // app.delete('/item/:id', (request, response) => {
+  //   let { id } = request.params;
+  //   knex('item')
+  //   .where({id: 3})
+  //   .delete()
+  //   // .then(inventory => {return res.json({msg: "bob"});})
+  //   console.log(inventory)
+  //   .catch((err) => {
+  //     console.error(err);
+  //     return res.json({msg: err});
+  //     });
+  // });
 
   // app.delete('/item/:item_ID', async (request, response) => {
   //   let {item_ID} = request.params

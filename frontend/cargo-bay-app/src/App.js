@@ -48,7 +48,7 @@ export default function App() {
       fetch('http://localhost:8081/item')
       .then(response => response.json())
       .then(inventoryData => setInventory(inventoryData))
-    },[])
+    },[inventory])
   // },[inventory])
 
   const addUser = () =>{
@@ -93,9 +93,9 @@ export default function App() {
     .then((json) => console.log(json));
   }
 
-  const editItem = (item_ID) =>{
-    // targetItemID = item_ID;
-    fetch('http://localhost:8081/item/${item_ID}', {
+  const editItem = (id) =>{
+    inventory.id = id;
+    fetch(`http://localhost:8081/item/`+`${id}`, {
       method: 'PATCH',
       body: JSON.stringify({
         user_id: updateUserInfoID,
@@ -110,22 +110,6 @@ export default function App() {
     .then((response) => response.json())
     .then((json) => console.log(json));
   }
-
-
-  // function onDeleteItem(){
-  //   var id = document.getElementById("selectedItemId").value;
-  //   const deleted = fetch('http://localhost:8081/${item_ID}',{
-  //     method: 'DELETE',
-  //     headers: {'Content-type': 'application/json; charset=UTF-8'}
-  //   })
-  // }
-
-  // const deleteItem = () =>{
-  //   fetch('http://localhost:8081/item/4', {
-  //       method: 'DELETE',
-  //       headers: {'Content-type': 'application/json; charset=UTF-8'}
-  //     });
-  // }
 
   const deleteItem = (id) =>{
     inventory.id = id;

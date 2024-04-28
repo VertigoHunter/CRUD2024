@@ -3,7 +3,7 @@ GET http://localhost:8081/item
 Content-type: application/json
 
 ### Request 2
-GET http://localhost:8081/item/3
+GET http://localhost:8081/item/2
 Content-type: application/json
 
 ### Request 3
@@ -33,12 +33,15 @@ Content-type: application/json
 }
 
 ### Request 6
-PATCH http://localhost:8081/item/id
-'Content-type': 'application/json; charset=UTF-8'
-user_id: updateUserInfoID,
-item_name: updateItemName,
-description: updateDescription,
-quantity: updateQuantity
+PATCH http://localhost:8081/item/3
+Content-type: application/json
+
+{
+  "user_id": "2",
+  "item_name": "X-Wing",
+  "description": "4 engine fighter used by Rebel Alliance",
+  "quantity": "210"
+}
 
 ### Request 7
 DELETE http://localhost:8081/user_info/10
