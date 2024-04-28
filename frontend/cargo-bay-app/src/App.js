@@ -17,7 +17,8 @@ export default function App() {
   const [greeting, setGreeting] = useState("Guest");
   useEffect(() => {setGreeting('Scruffy Nerfherder')});
 
-  const [inventory, setInventory] = useState();
+  const [inventory, setInventory] = useState(); // This stores every item in the Cargo Bay.
+  const [fullItem, setFullItem] = useState([]); // This stores the selected item you want to have its full description displayed.
 
   const [createFirstName, setCreateFirstName] = useState(); // This stores the entered user account information for signup.
   const [createLastName, setCreateLastName] = useState();   // This stores the entered user account information for signup.
@@ -48,8 +49,14 @@ export default function App() {
       fetch('http://localhost:8081/item')
       .then(response => response.json())
       .then(inventoryData => setInventory(inventoryData))
-    },[inventory])
+    },[])
   // },[inventory])
+
+  useEffect(()=> {
+    fetch(`http://localhost:8081/item/`+`1`)
+    .then(response => response.json())
+    .then(itemData => setFullItem(itemData))
+  },[])
 
   const addUser = () =>{
     fetch('http://localhost:8081/user_info', {
@@ -128,6 +135,13 @@ export default function App() {
       });
   }
 
+  const viewFullItem = (id) =>{
+    inventory.id = id;
+    fetch(`http://localhost:8081/item/`+`${id}`)
+    .then(response => response.json())
+    .then(itemData => setFullItem(itemData))
+  }
+
   const RenderEditBar = () =>{
     if (editMode)
       return(
@@ -156,7 +170,7 @@ export default function App() {
             <table>
               <tbody>
                 <tr className='columntitle'>
-                  <th>Item ID</th>
+                  <th>ID</th>
                   <th>User ID</th>
                   <th>Item Name</th>
                   <th>Description</th>
@@ -169,7 +183,7 @@ export default function App() {
                     <td>{inventory.id}</td>
                     <td>{inventory.user_id}</td>
                     <td>{inventory.item_name}</td>
-                    <td>{inventory.description}</td>
+                    <td>{inventory.description}{inventory.description.length > 100 ?`${inventory.description.substring(0, 100)}...` : inventory.description}</td>
                     <td>{inventory.quantity}</td>
                     <td><button onClick={() => {{ editItem(inventory.id) }} }>Update</button></td>
                     <td><button onClick={() => {{ deleteItem(inventory.id)}} } className="trashbutton"><img src={trashbin} alt="trashbin" className='trashimage'></img></button></td>
@@ -186,19 +200,21 @@ export default function App() {
           <table>
             <tbody>
               <tr className='columntitle'>
-                <th>Item ID</th>
+                <th>ID</th>
                 <th>User ID</th>
                 <th>Item Name</th>
                 <th>Description</th>
                 <th>Quantity</th>
+                <th>View Item</th>
               </tr>
             {inventory.map((inventory, index) =>
               <tr key={index}>
                 <td>{inventory.id}</td>
                 <td>{inventory.user_id}</td>
                 <td>{inventory.item_name}</td>
-                <td>{inventory.description}</td>
+                <td>{inventory.description}{inventory.description.length > 100 ?`${inventory.description.substring(0, 100)}...` : inventory.description}</td>
                 <td>{inventory.quantity}</td>
+                <td><button onClick={() => {{ viewFullItem(inventory.id) }} }>View</button></td>
               </tr>)}
             </tbody>
           </table>
@@ -236,6 +252,31 @@ export default function App() {
 
       <button onClick={setEditMode}>{editMode ? 'Edit Mode On ' : 'Edit Mode Off'}</button>
       <RenderEditBar/>
+      <br></br>
+      <br></br>
+      <br></br>
+      <div className="view-panel">
+      <h2>Full Item Viewer</h2>
+      <table>
+            <tbody>
+              <tr className='columntitle'>
+                <th>ID</th>
+                <th>User ID</th>
+                <th>Item Name</th>
+                <th>Description</th>
+                <th>Quantity</th>
+              </tr>
+              {fullItem.map((fullItem, index) =>
+              <tr key={index}>
+                <td>{fullItem.id}</td>
+                <td>{fullItem.user_id}</td>
+                <td>{fullItem.item_name}</td>
+                <td>{fullItem.description}</td>
+                <td>{fullItem.quantity}</td>
+              </tr>)}
+            </tbody>
+          </table>
+      </div>
   </div>
   );
 }

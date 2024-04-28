@@ -38,6 +38,14 @@ body {
   justify-content: center;
 }
 
+.view-panel {
+  justify-content: space-between;
+  margin:10px;
+  padding: 10px;
+  border-color: azure;
+  border-style:outset;
+}
+
 table {
   font-family: arial, sans-serif;
   border-collapse: collapse;
