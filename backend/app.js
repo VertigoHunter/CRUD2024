@@ -50,12 +50,12 @@ app.get('/item', (request, response) => {
     );
 });
 
-// GET ROUTE #2. Below retrieves the current item by item_ID as provided by item_table.
-app.get('/item/:item_ID', (request, response) => {
-  var { item_ID } = request.params;
+// GET ROUTE #2. Below retrieves the current item by id as provided by item_table.
+app.get('/item/:id', (request, response) => {
+  var { id } = request.params;
   knex('item')
   .select('*')
-  .where('item_ID', item_ID)
+  .where('id', id)
   .then(inventory => {response.status(200).json(inventory)})
   .catch(err =>
     response.status(404).json({
@@ -95,10 +95,10 @@ app.get('/user_info', (request, response) => {
 
 // POST REQUEST #1. Below submits new profile information to the user_info table and acts as SignUp/CreateAccount.
 app.post('/user_info', async(request, response) => {
-  const maxIdQuery = await knex('user_info').max('user_info_ID as maxId').first() // Counts the highest ID that exists
+  const maxIdQuery = await knex('user_info').max('id as maxId').first() // Counts the highest ID that exists
 
   await knex('user_info').insert({
-    user_info_ID: maxIdQuery.maxId + 1,
+    id: maxIdQuery.maxId + 1,
     first_name: request.body.first_name,
     last_name: request.body.last_name,
     user_name: request.body.user_name,
@@ -119,11 +119,11 @@ app.post('/user_info', async(request, response) => {
 
 // POST REQUEST #2. Below submits new item information to inventory.
 app.post('/item', async(request, response) => {
-  const maxIdQuery = await knex('item').max('item_ID as maxId').first() // Counts the highest ID that exists
+  const maxIdQuery = await knex('item').max('id as maxId').first() // Counts the highest ID that exists
 
   await knex('item').insert({
-    item_ID: maxIdQuery.maxId + 1,
-    user_info_ID: request.body.user_info_ID,
+    id: maxIdQuery.maxId + 1,
+    user_id: request.body.user_id,
     item_name: request.body.item_name,
     description: request.body.description,
     quantity: request.body.quantity
@@ -144,10 +144,10 @@ app.post('/item', async(request, response) => {
 /* THE FOLLOWING ARE PUT REQUESTS FOR UPDATES TO THE DATABASE */
 
 // PATCH REQUEST #1. Below provides an update to the current inventory as provided by item_table.
-app.patch('/item/:item_ID', async(request, response) =>{
-  await knex('item').where('item_ID', request.params.item_ID)
+app.patch('/item/:id', async(request, response) =>{
+  await knex('item').where('id', request.params.id)
   .update({
-    user_info_ID: request.body.user_info_ID,
+    id: request.body.id,
     item_name: request.body.item_name,
     description: request.body.description,
     quantity: request.body.quantity
@@ -162,8 +162,8 @@ app.patch('/item/:item_ID', async(request, response) =>{
 });
 
 // PUT REQUEST #2. Below provides an update to the current inventory as provided by user_info_table.
-app.put('/user_info/:user_info_ID', function(request, response){
-  knex('user_info').where('user_info_ID', req.params.item_ID)
+app.put('/user_info/:id', function(request, response){
+  knex('user_info').where('id', req.params.id)
   .update({
     first_name: request.body.first_name,
     last_name: request.body.last_name,
@@ -179,35 +179,34 @@ app.put('/user_info/:user_info_ID', function(request, response){
   })
 
   //DELETE REQUEST. Deletes the item by its item_ID as provided by item_table.
-  app.delete('/item/:item_ID/7', (request, response) => {
-    knex('item').where('id', 7).del()
-  })
+  // app.delete('/item/:id', (request, response) => {
+  //   knex('item').where('id', 7).del()
+  // })
 
 
   // app.delete('/item/:id', (request, callback) => {
   //   var query = knex('item')
   //   .del()
-  //   .where({id:request.params.item_ID});
+  //   .where({id:request.params.id});
   //   query.exec( function(err){
   //     if(err) return callback(err);
   //     sendResponse(callback);
   //   })
   // });
 
-  // app.delete('/item/:item_ID', (request, response) => {
-  //   var { item_ID } = request.params;
-  //   knex('item')
-  //   .select('*')
-  //   .where('item_ID', item_ID)
-  //   .delete()
-  //   .then(inventory => {response.status(200).json(inventory)})
-  //   .catch(err =>
-  //     response.status(404).json({
-  //       message:
-  //       'The data is not available.'
-  //     })
-  //     );
-  // });
+  app.delete('/item/:id', (request, response) => {
+    let { id } = request.params;
+    knex('item')
+    .select('*')
+    .where('id', id)
+    .delete()
+    .then(inventory => {return res.json({msg: "bob"});})
+    console.log(inventory)
+    .catch((err) => {
+      console.error(err);
+      return res.json({msg: err});
+      });
+  });
 
   // app.delete('/item/:item_ID', async (request, response) => {
   //   let {item_ID} = request.params

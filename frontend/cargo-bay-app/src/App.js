@@ -80,7 +80,7 @@ export default function App() {
     fetch('http://localhost:8081/item', {
       method: 'POST',
       body: JSON.stringify({
-        user_info_ID: userInfoID,
+        user_id: userInfoID,
         item_name: itemName,
         description: description,
         quantity: quantity
@@ -98,7 +98,7 @@ export default function App() {
     fetch('http://localhost:8081/item/${item_ID}', {
       method: 'PATCH',
       body: JSON.stringify({
-        user_info_ID: updateUserInfoID,
+        user_id: updateUserInfoID,
         item_name: updateItemName,
         description: updateDescription,
         quantity: updateQuantity
@@ -127,18 +127,18 @@ export default function App() {
   //     });
   // }
 
-  const deleteItem = (item_ID) =>{
-    inventory.item_ID = item_ID;
-    fetch('http://localhost:8081/item/${item_ID}', {
+  const deleteItem = (id) =>{
+    inventory.id = id;
+    fetch(`http://localhost:8081/item/`+`${id}`, {
         method: 'DELETE',
         headers: {'Content-type': 'application/json; charset=UTF-8'}
       });
   }
 
-  const ManualDeleteItem = (item_ID) =>{
+  const ManualDeleteItem = (id) =>{
     // const [killTargetItemID, setKillTargetItemID] = useState("");
-    item_ID = killTargetItemID;
-    fetch('http://localhost:8081/item/'+'${item_ID}', {
+    id = killTargetItemID;
+    fetch(`http://localhost:8081/item/`+`${id}`, {
         method: 'DELETE',
         headers: {'Content-type': 'application/json; charset=UTF-8'}
       });
@@ -182,13 +182,13 @@ export default function App() {
                 </tr>
                 {inventory.map((inventory, index) =>
                   <tr key={index}>
-                    <td>{inventory.item_ID}</td>
-                    <td>{inventory.user_info_ID}</td>
+                    <td>{inventory.id}</td>
+                    <td>{inventory.user_id}</td>
                     <td>{inventory.item_name}</td>
                     <td>{inventory.description}</td>
                     <td>{inventory.quantity}</td>
-                    <td><button onClick={() => {{ editItem(inventory.item_ID) }} }>Update</button></td>
-                    <td><button onClick={() => {{ deleteItem(inventory.item_ID)}} } className="trashbutton"><img src={trashbin} alt="trashbin" className='trashimage'></img></button></td>
+                    <td><button onClick={() => {{ editItem(inventory.id) }} }>Update</button></td>
+                    <td><button onClick={() => {{ deleteItem(inventory.id)}} } className="trashbutton"><img src={trashbin} alt="trashbin" className='trashimage'></img></button></td>
                     {/* <td><button onClick={() => { { setTargetItemID(inventory.item_ID) } { editItem(targetItemID) } }}>Update</button></td>
                     <td><button onClick={() => { { setTargetItemID(inventory.item_ID) } { deleteItem(targetItemID) } }} className="trashbutton"><img src={trashbin} alt="trashbin" className='trashimage'></img></button></td> */}
                   </tr>)}
@@ -210,8 +210,8 @@ export default function App() {
               </tr>
             {inventory.map((inventory, index) =>
               <tr key={index}>
-                <td>{inventory.item_ID}</td>
-                <td>{inventory.user_info_ID}</td>
+                <td>{inventory.id}</td>
+                <td>{inventory.user_id}</td>
                 <td>{inventory.item_name}</td>
                 <td>{inventory.description}</td>
                 <td>{inventory.quantity}</td>
