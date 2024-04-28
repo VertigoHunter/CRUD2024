@@ -1,0 +1,41 @@
+### Request 1
+GET http://localhost:8081/item
+Content-type: application/json
+
+### Request 2
+POST http://localhost:8081/user_info
+Content-type: application/json
+
+{
+  "first_name": "GI",
+  "last_name": "JOE",
+  "user_name": "GI JOE",
+  "password": "YOJOE!"
+}
+
+### Request 3
+POST http://localhost:8081/item
+Content-type: application/json
+
+{
+  "user_info_ID": "2",
+  "item_name": "X-Wing",
+  "description": "All around great starfighter",
+  "quantity": "10"
+}
+
+### Request 4
+PATCH http://localhost:8081/item/{{item_ID}}
+'Content-type': 'application/json; charset=UTF-8'
+user_info_ID: updateUserInfoID,
+item_name: updateItemName,
+description: updateDescription,
+quantity: updateQuantity
+
+### Request 5
+DELETE http://localhost:8081/user_info/10
+Content-type: application/json
+
+### Request 6
+DELETE http://localhost:8081/item/7
+Content-type: application/json

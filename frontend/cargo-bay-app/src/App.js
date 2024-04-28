@@ -40,7 +40,8 @@ export default function App() {
   const [updateQuantity, setUpdateQuantity] = useState("");
 
   // The following stores the target item_ID for update and delete actions.
-  const [targetItemID, setTargetItemID] = useState("");
+  // const [updateTargetItemID, setUpdateTargetItemID] = useState("");
+  const [killTargetItemID, setKillTargetItemID] = useState("");
 
     /* THIS SECTION HOLDS METHODS AND ACTIONS */
     useEffect(()=> {
@@ -93,9 +94,9 @@ export default function App() {
   }
 
   const editItem = (item_ID) =>{
-    targetItemID = item_ID;
+    // targetItemID = item_ID;
     fetch('http://localhost:8081/item/${item_ID}', {
-      method: 'PUT',
+      method: 'PATCH',
       body: JSON.stringify({
         user_info_ID: updateUserInfoID,
         item_name: updateItemName,
@@ -127,8 +128,17 @@ export default function App() {
   // }
 
   const deleteItem = (item_ID) =>{
-    targetItemID = item_ID;
+    inventory.item_ID = item_ID;
     fetch('http://localhost:8081/item/${item_ID}', {
+        method: 'DELETE',
+        headers: {'Content-type': 'application/json; charset=UTF-8'}
+      });
+  }
+
+  const ManualDeleteItem = (item_ID) =>{
+    // const [killTargetItemID, setKillTargetItemID] = useState("");
+    item_ID = killTargetItemID;
+    fetch('http://localhost:8081/item/'+'${item_ID}', {
         method: 'DELETE',
         headers: {'Content-type': 'application/json; charset=UTF-8'}
       });
@@ -154,6 +164,8 @@ export default function App() {
             <input type="text" name="update description" onChange={(e) => { setUpdateDescription(e.target.value) }} value={updateDescription} placeholder="Change Description" />
             <input type="text" name="update quantity" onChange={(e) => { setUpdateQuantity(e.target.value) }} value={updateQuantity} placeholder="Change Quantity" />
             <h6>Input updated item information and select the row to update below.</h6>
+            <input type="text" name="target for kill" onChange={(e) => { setKillTargetItemID(e.target.value) }} value={killTargetItemID} placeholder="Select Item_ID for Deletion" />
+            <button onClick={() => {{ ManualDeleteItem(killTargetItemID) }} }>Delete Item</button>
           </div>
 
           <div className='inventoryTable'>
@@ -175,8 +187,10 @@ export default function App() {
                     <td>{inventory.item_name}</td>
                     <td>{inventory.description}</td>
                     <td>{inventory.quantity}</td>
-                    <td><button onClick={() => { { setTargetItemID(inventory.item_ID) } { editItem(targetItemID) } }}>Update</button></td>
-                    <td><button onClick={() => { { setTargetItemID(inventory.item_ID) } { deleteItem(targetItemID) } }} className="trashbutton"><img src={trashbin} alt="trashbin" className='trashimage'></img></button></td>
+                    <td><button onClick={() => {{ editItem(inventory.item_ID) }} }>Update</button></td>
+                    <td><button onClick={() => {{ deleteItem(inventory.item_ID)}} } className="trashbutton"><img src={trashbin} alt="trashbin" className='trashimage'></img></button></td>
+                    {/* <td><button onClick={() => { { setTargetItemID(inventory.item_ID) } { editItem(targetItemID) } }}>Update</button></td>
+                    <td><button onClick={() => { { setTargetItemID(inventory.item_ID) } { deleteItem(targetItemID) } }} className="trashbutton"><img src={trashbin} alt="trashbin" className='trashimage'></img></button></td> */}
                   </tr>)}
               </tbody>
             </table>
@@ -238,32 +252,6 @@ export default function App() {
 
       <button onClick={setEditMode}>{editMode ? 'Edit Mode On ' : 'Edit Mode Off'}</button>
       <RenderEditBar/>
-
-      {/* <div className='inventoryTable'>
-        <table>
-          <tbody>
-            <tr className='columntitle'>
-              <th>Item ID</th>
-              <th>User ID</th>
-              <th>Item Name</th>
-              <th>Description</th>
-              <th>Quantity</th>
-              <th>Update</th>
-              <th>Delete</th>
-            </tr>
-            {inventory.map((inventory, index) =>
-              <tr key={index}>
-                <td>{inventory.item_ID}</td>
-                <td>{inventory.user_info_ID}</td>
-                <td>{inventory.item_name}</td>
-                <td>{inventory.description}</td>
-                <td>{inventory.quantity}</td>
-                <td><button onClick={() => { {setTargetItemID(inventory.item_ID)} {editItem(targetItemID)} }}>Update</button></td>
-                <td><button onClick={() => { {setTargetItemID(inventory.item_ID)} {deleteItem(targetItemID)} }} className="trashbutton"><img src={trashbin} alt="trashbin" className='trashimage'></img></button></td>
-              </tr>)}
-          </tbody>
-        </table>
-      </div> */}
   </div>
   );
 }
