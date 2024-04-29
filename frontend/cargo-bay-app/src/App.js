@@ -3,7 +3,7 @@ import trashbin from './trashbin.png';
 // import ReactDom from 'react-dom/client';
 // import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
-import React, { useState, useEffect, createContext, useContext } from "react";
+import React, { useState, useEffect, useRef, createContext, useContext } from "react";
 import useEditModeToggle from './useEditModeToggle';
 // import { GuestInventory } from './GuestInventory';
 // import { ManagerInventory} from './ManagerInventory';
@@ -25,8 +25,11 @@ export default function App() {
   const [createUserName, setCreateUserName] = useState();   // This stores the entered user account information for signup.
   const [createPassword, setCreatePassword] = useState();   // This stores the entered user account information for signup.
 
-  const [loginUserName, setLoginUserName] = useState(); // This stores the username for authentication.
-  const [loginPassword, setLoginPassword] = useState(); // This stores the password for authentication.
+  const [loginUserName, setLoginUserName] = useState("temp"); // This stores the username for authentication.
+  const [loginPassword, setLoginPassword] = useState("temp"); // This stores the password for authentication.
+  const [loginStatusMessage, setLoginStatusMessage] = useState("Not Logged In"); // This stores the current login status.
+  const [loginDataCheck, setLoginDataCheck] = useState(null); // This stores the the login data to be checked.
+
 
   // The following store information for adding new items to the database.
   const [userInfoID, setUserInfoID] = useState(2);
@@ -75,13 +78,19 @@ export default function App() {
     .then((json) => console.log(json));
   }
 
-  // const loginUser = () =>{
-  //   fetch('http://localhost:8081/user_info', {
-  //     method: 'GET',
-  //     user_name: loginUserName,
-  //     password: loginPassword
-  //   })
-  // }
+  const dataChecker = (loginDataCheck, value) => Object.values(loginDataCheck).includes(value);
+
+  const loginUser = ({loginUserName, loginPassword}) =>{
+    fetch('http://localhost:8081/user_info', {
+      method: 'GET',
+    })
+    .then((response) => response.json())
+    .then(loginDataCheck => setLoginDataCheck(loginDataCheck));
+
+    if (dataChecker(loginDataCheck, loginUserName) == true && dataChecker(loginDataCheck, loginPassword))
+    return setLoginStatusMessage = "Logged In"
+    else setLoginStatusMessage = "User Name and/or Password Not Found"
+  }
 
   const addItem = () =>{
     fetch('http://localhost:8081/item', {
@@ -127,7 +136,6 @@ export default function App() {
   }
 
   const ManualDeleteItem = (id) =>{
-    // const [killTargetItemID, setKillTargetItemID] = useState("");
     id = killTargetItemID;
     fetch(`http://localhost:8081/item/`+`${id}`, {
         method: 'DELETE',
@@ -187,8 +195,6 @@ export default function App() {
                     <td>{inventory.quantity}</td>
                     <td><button onClick={() => {{ editItem(inventory.id) }} }>Update</button></td>
                     <td><button onClick={() => {{ deleteItem(inventory.id)}} } className="trashbutton"><img src={trashbin} alt="trashbin" className='trashimage'></img></button></td>
-                    {/* <td><button onClick={() => { { setTargetItemID(inventory.item_ID) } { editItem(targetItemID) } }}>Update</button></td>
-                    <td><button onClick={() => { { setTargetItemID(inventory.item_ID) } { deleteItem(targetItemID) } }} className="trashbutton"><img src={trashbin} alt="trashbin" className='trashimage'></img></button></td> */}
                   </tr>)}
               </tbody>
             </table>
@@ -243,13 +249,16 @@ export default function App() {
 
         <div className="login-panel">
           <p>LOGIN SECTION.</p>
-          <input type="text" name="username_login" value="" placeholder="User Name"/>
-          <input type="password" name="password_login" value="" placeholder="Password"/>
+          <input type="text" name="username_login" onChange={(e) => { setLoginUserName(e.target.value) }}value={loginUserName} placeholder="User Name"/>
+          <input type="password" name="password_login" onChange={(e) => { setLoginPassword(e.target.value) }}value={loginPassword} placeholder="Password"/>
           <br></br>
-          <button onClick={() => { }}>Login</button>
+          <button onClick={() => {loginUser(loginUserName, loginPassword)}}>Login</button>
+          {(loginStatusMessage)}
         </div>
       </div>
-
+      <br></br>
+      <br></br>
+      <br></br>
       <button onClick={setEditMode}>{editMode ? 'Edit Mode On ' : 'Edit Mode Off'}</button>
       <RenderEditBar/>
       <br></br>

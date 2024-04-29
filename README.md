@@ -25,23 +25,27 @@ To get started until docker compose is completed:
 
 1) npm install in all folders (backend, inventory-app)
 2) open docker desktop
-3) docker pull postgres:latest
-4) docker run --rm --name pg-docker -e POSTGRES_PASSWORD=docker -d -p 5432:5432 -v $HOME/docker/volumes/postgres:/var/lib/postgresql/data postgres
+3) New Terminal: cd in database
+4) docker pull postgres:latest
+5) docker run --rm --name pg-docker -e POSTGRES_PASSWORD=docker -d -p 5432:5432 -v $HOME/docker/volumes/postgres:/var/lib/postgresql/data postgres
    -- IF you don't have 'crudz' database--
     - docker ps -a
     - docker exec -it <container id> bash
     - psql -U postgres
     - create DATABASE crudz; //Comment: named based on database for CRUD for Z prefix
-    - \list
-    - \c cargo_bay
-    - \dt
-    - \d item
-5) cd into database
-6) npx knex migrate:rollback several times(if errors in step 7-8)
-7) npx knex migrate:latest
-8) npx knex seed:run
-9) npm start in the database folder first
-10) npm start in the frontend folder (inventory-app folder)
+    - \list; [Note] This will show you your list of databases.
+    - \c; cargo_bay [Note] This will allow you to connect to the cargo_bay database
+    - \dt; [Note] This will show you the available schema for the tables.
+    - \d; item [Note] This will show you the schema for the item table.
+    - SELECT * FROM item; [note] This will show you the data within the item table.
+    - q [note] This will quit whatever you are looking at and go up one level.
+    - DELETE FROM item WHERE id=3; [note] Do this to manually delete and item from the item table.
+6) New Terminal: cd into database
+7) npx knex migrate:rollback several times(if errors in step 7-8)
+8) npx knex migrate:latest
+9) npx knex seed:run
+10) npm start in the database folder first
+11) New Terminal: npm start in the frontend folder (inventory-app folder)
 ===========================================================================
 UNDER THE HOOD:
 
@@ -53,44 +57,54 @@ UNDER THE HOOD:
 
         -- TABLES:
         User Info Table
-            - Contains: user_info_id, first_name, last_name, user_name, and password.
+            - Contains: id, first_name, last_name, user_name, and password.
 
         Item Table
-            - Contains: item_id, user_info_id , item_name, description, and quantity.
-            - "user_info_id" is a foreign key.
+            - Contains: id, user_id , item_name, description, and quantity.
+            - "user_id" is a foreign key.
 
 ===========================================================================
 DEVELOPER NOTES:
 
-- User Story (Viewer): Not logged in.
-  -- [X] Can see full inventory.
-  -- [X] Can see expanded view on individual item. //Comment: currently covered due to all fields being visible within normal inventory view.
-  -- [/] Can signup to create a login. //Comment: Signup State variables exist. POST exists. Submission button functionality is in progress.
-  -- [/] Can login. //Comment: Login variables exist. Submission button functionality is in progress.
+- USER STORY:
 
-- User Story (Inventory Manager):
-  -- [X] Can see full inventory.
-  -- [/] Can enable Edit Mode. //Comment: Edit buttons are in a div which will render based on the [editFlag, setEditFlag] useState.
-  -- [/] Can create a new item and be redirected to inventory. //Comment: Item State variables exist. POST and button functionality in progress.
-  -- [/] Can edit an item and be redirected to inventory. //Comment: PUT requests exist but are untested until buttonolgy completed.
-  -- [/] Can delete an item and be redirected to inventory. //Comment: Deletion buttons exist but will not be implemented until POSTs function.
+1. Manager can create account.
+  -- [X] First Name, Last Name, User Name, and Password can get POSTED to the database user_info table.
 
-- User Story (Both):
-  -- [ ] Items should only display first 100 characters of description with ... at end.
+2. Manager can login.
+  -- [/] Data is submitted and received, but the checker currently has a TypeError.
 
-- Full Stack Status:
-  -- [X] Frontend Client exists and communicates with Backend Server.
-  -- [X] Backend Server exists and can communicate with Database.
-  -- [X] Database exists and can hold data.
+3. Manager can create new item.
 
-- Connectivity Status:
-  -- [3.5] User Interface: Matches layout specified. Users can see resource but not create them.
-  -- [4] App-Server Communication: There are two functioning GET requests with the App showing the inventory from item_table database.
-  -- [4] Server: Server exists with two functioning GET requests and a built POST request that is awaiting buttonology.
-  -- [3.5] DB Interaction: DB & Server communicate, DB contains dummy data. A POST request exists but is awaiting buttonology.
-  -- [?] Authentication: **Authentication does not yet work but is planned out. After hitting login to confirm the entered username and password    matches an entry in the user_info table within the database, the loginFlag (which exists) within frontend App.js will be toggled to true. This will denote the viewer as an Inventory Manager. This will reveal a toggle for Edit Mode controlled by the editFlag (which exists). Once edit mode is activated, the buttons within className edit-bar will become visible.**
+  -- [X] While in edit mode, item attributes can get POSTED to the database info table.
 
-- Latest Developer Update:
+4. Manager can see inventory (100…)
+  -- [X] Both Edit Mode viewing window and default viewing window will truncate item descriptions after 100 characters and terminate it with ...
+
+5. Manager can view full item.
+  -- [X] Manager can see the selected item with full length description by clicking the view button when not in Edit Mode.
+
+6. Manager can edit item.
+  -- [X] Manager can submit changes to an item via a PATCH to database info table.
+
+7. Manager can delete item.
+  -- [ ] Functionality blocked by unknown configuration setting. Client actions and Backend delete routes exist but are blocked. Things can only be deleted by making the command directly to the database when signed in as user POSTGRES.
+
+8. Visitor can see inventory (100...)
+  -- [X] The default viewing window will truncate item descriptions after 100 characters and terminate it with ...
+
+9. Visitor can see view full item.
+  -- [X] Visitor can see the selected item with full length description by clicking the view button.
+
+10. Manager can see all manager items
+  -- [X] Manager can always see all items regardless of being in Edit Mode.
+
+- CRUD Functionality:
+
+-- [X] x4 GET Routes (root, item, item/:id, user_info)
+-- [X] x2 POST Routes (user_info, item)
+-- [X] x2 PUT/PATCH Routes (item, user_info/:id)
+-- [/] x1 DELETE Route (item/:id) ~ This fully exists on frontend and backend but seems to not have permission.
 
 ===========================================================================
 USAGE:
@@ -107,16 +121,15 @@ TROUBLE SHOOTING:
 ===========================================================================
 FUTURE IMPLEMENTATION:
 
-- User Story (Viewer): Not logged in.
-  -- [/] Can signup to create a login. //Comment: Signup State variables exist. POST exists. Submission button functionality is in progress.
-  -- [/] Can login. //Comment: Login variables exist. Submission button functionality is in progress.
+- Functionality:
+  -- [/] Password protection before the site goes live with real data. Will use bcrypt to hash the passwords.Bcrypt is installed but not yet used.
+  -- [/] Login Functionality mostly exists but needs adjustment to overcome uncaught TypeError: Assignment to constant variable before being moved to backend. However, you can register and then send your data to login. The positive detection of the registered data needs fine tuning. After logging in is fixed, the EditMode will be adjusted so it only renders when logged in. A logout button will be added.
 
-- User Story (Inventory Manager):
-  -- [/] Can enable Edit Mode. //Comment: Edit buttons are in a div which will render based on the [editFlag, setEditFlag] useState.
-  -- [/] Can create a new item and be redirected to inventory. //Comment: Item State variables exist. POST and button functionality in progress.
-  -- [/] Can edit an item and be redirected to inventory. //Comment: PUT requests exist but are untested until buttonolgy completed.
-  -- [/] Can delete an item and be redirected to inventory. //Comment: Deletion buttons exist but will not be implemented until POSTs function.
+- Presentation:
+  -- [/] Work on spacing and minor visual polish. Make text fields return to default (empty) after data is submitted. While in edit mode, the inputs only receive one letter at a time and have to be clicked into again. This only happened after it was moved into the edit mode div. The 8081/item fetch currently runs once. By adding [inventory] to the fetch, it will auto update but it currently continuously runs instead of only running when a change occurs. It was set to [] to prevent possible crash.
 
-- User Story (Both):
-  -- [ ] Items should only display first 100 characters of description with ... at end.
-  -- [ ] Password protection before the site goes live with real data.
+- Code:
+ -- [/] Clean up commented out dead-end code while keeping developer note comments.
+
+ - Automation:
+ -- [/] Docker compose up and compose down functionality is in progress, but not completely configured. NPM start front and back per instructions to launch app.
